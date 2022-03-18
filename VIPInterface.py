@@ -405,6 +405,9 @@ def geneFiltering(adata,cutoff,opt):
     adata = sc.AnnData(X,adata.obs)
   return adata
 
+def CellPopView(data):
+  pass
+
 def SGV(data):
   # figure width and heights depends on number of unique categories
   # characters of category names, gene number
