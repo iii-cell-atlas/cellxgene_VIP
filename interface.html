@@ -552,6 +552,7 @@
       <button class="tablinks" onclick="selFun(event, 'MARK')">Marker Genes</button>
       <button id="browserBT" class="tablinks" onclick="selFun(event, 'BROW')" style="display: none;">Multiome</button>
       <button class="tablinks" onclick="selFun(event, 'SPATIAL');defaultTopSel('SPATIAL','SPATIALimage')">Spatial Transcriptomics</button>
+      <button class="tablinks" onclick="selFun(event, 'CellPopView')">Cell Population View</button>
       <button class="tablinks" onclick="selFun(event, 'CLI')">Command Line Interface</button>
       <button id="metaCellBT" class="tablinks colorButton" onclick="metaSel()" style="display: none;">Show MetaCell</button>
       <div id="metaCellBTspin" class="loading style-2" style="visibility: hidden;"><div class="loading-wheel"></div></div>
@@ -1538,6 +1539,19 @@
         <div class="grid-stack"></div>
       </div>
     </div><!--SPATIAL-->
+	  
+    <div id="CellPopView" class="tabcontent">
+      <div id="CellPopInput">
+        <h3>For a given cell population, compare gene expression between two conditions</h3>
+        <p>Select a Cell Population:
+        <select id="CellPopGrp"></select></p>
+	  <p>Select Condition 1:
+        <select id="Condition1"></select></p>
+        <p>Select Condition 2:
+        <select id="Condition2"></select></p>
+        <p id="CellPopFig"></p>
+      </div>
+    </div><!--CellPopView-->
 
     <div id="BRUSH" class="tabcontent">
       <h3>Brushed ranges <a href="https://interactivereport.github.io/cellxgene_VIP/tutorial/docs/how-to-use-cellxgene-vip.html#vip-other-functions" target="_blank"><i class="fa fa-question-circle" style="font-size:20px"></a></i></h3>
@@ -5259,6 +5273,29 @@ function GetStyle(CLASSname){
         }
     }
 }
+
+//cell population view function
+function CellPopPlot(acc) {
+
+var Cluster = [$('#CPV_Cluster'].val()];
+
+var ClusterKey = [$('#CPV_ClusterKey'].val()];
+
+var ConditionKey = [$('#CPV_ConditionKey'].val()];
+
+var Cond1 = [$('#CPV_C1'].val()];
+
+var Cond2 = [$('#CPV_C2'].val()];
+
+var D = {'method':'CPV',
+		'dataset': window.store.getState().config.displayNames.dataset+'.h5ad',
+		'Cluster':Cluster,
+		'ClusterKey':ClusterKey,
+		'ConditionKey':ConditionKey,
+		'Cond1':Cond1,
+		'Cond2':Cond2;
+}
+
 GetStyle('circle').style = {};
 </script>
 
