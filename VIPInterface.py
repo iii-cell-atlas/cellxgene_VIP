@@ -605,18 +605,11 @@ def pHeatmap(data):
   # if the number of element in a category is smaller than 10, "Set1" or "Set3" is choosen
   # if the number of element in a category is between 10 and 20, default is choosen
   # if the number of element in a category is larger than 20, husl is choosen
-  #Xsep = createData(data,True)
-  #adata = sc.AnnData(Xsep['expr'],Xsep['obs'])
-  #sT = time.time()
 
   adata = createData(data)
   if len(data['grpNum'])>0:
     adata.obs = pd.concat([adata.obs,getObsNum(data)],axis=1)
   data['grp'] += data['addGrp']
-  #Xdata = pd.concat([adata.to_df(),adata.obs], axis=1, sort=False).to_csv()
-  #ppr.pprint('HEAT data reading cost %f seconds' % (time.time()-sT) )
-  #sT = time.time()
-
 
   h = 8
   w = len(data['genes'])/3+0.3 + 2
@@ -628,11 +621,8 @@ def pHeatmap(data):
   if data['plotMethod']=='sns':
     exprOrder = True
     if data['order'][0]!="Expression":
-      exprOrder = False;
+      exprOrder = False
       adata = adata[adata.obs.sort_values(data['order']).index,]
-      #s = adata.obs[data['order']]
-      #ix = sorted(range(len(s)), key=lambda k: s[k])
-      #adata = adata[ix,]
     colCounter = 0
     colName =['Set1','Set3']
     grpCol = list()
@@ -651,15 +641,12 @@ def pHeatmap(data):
         lut = dict(zip(Ugrp,sns.color_palette("husl",len(Ugrp)).as_hex()))
       grpCol.append(grp.map(lut))
       grpLegend.append([mpatches.Patch(color=v,label=k) for k,v in lut.items()])
-      grpWd.append(max([len(x) for x in Ugrp]))#0.02*fW*max([len(x) for x in Ugrp])
+      grpWd.append(max([len(x) for x in Ugrp]))
       grpLen.append(len(Ugrp)+2)
     if data['norm']=='zscore':
       Zscore=1
-      #heatCol="vlag"
       heatCenter=0
       colTitle="Z-score"
-    #ppr.pprint('HEAT data preparing cost %f seconds' % (time.time()-sT) )
-    #sT = time.time()
 
     try:
       g = sns.clustermap(adata.to_df(),
@@ -669,21 +656,17 @@ def pHeatmap(data):
                        cbar_pos=(.3, .95, .55, .02),
                        cbar_kws={"orientation": "horizontal","label": colTitle,"shrink": 0.5})
     except Exception as e:
-      return 'ERROR: Z score calculation failed for 0 standard diviation. '+traceback.format_exc() # 'ERROR @server: {}, {}'.format(type(e),str(e))
+      return 'ERROR: Z score calculation failed for 0 standard diviation. '+traceback.format_exc()
 
-
-    #ppr.pprint('HEAT plotting cost %f seconds' % (time.time()-sT) )
-    #sT = time.time()
     g.ax_col_dendrogram.set_visible(False)
-    #g.ax_row_dendrogram.set_visible(False)
     plt.setp(g.ax_heatmap.xaxis.get_majorticklabels(), rotation=90)
     grpW = [1.02]
     grpH = [1.2]
     cumulaN = 0
     cumulaMax = 0
-    characterW=1/40 # a character is 1/40 of heatmap width
-    characterH=1/40 # a character is 1/40 of heatmap height
-    for i in sorted(range(len(grpLen)),key=lambda k:grpLen[k]):#range(5):#
+    characterW=1/40  # a character is 1/40 of heatmap width
+    characterH=1/40  # a character is 1/40 of heatmap height
+    for i in sorted(range(len(grpLen)),key=lambda k:grpLen[k]):
       cumulaN += grpLen[i]
       if cumulaN>(10+1/characterH):
           grpW.append(grpW[-1]+cumulaMax)
@@ -691,64 +674,12 @@ def pHeatmap(data):
           cumulaN =0
           cumulaMax=0
       leg = g.ax_heatmap.legend(handles=grpLegend[i],frameon=True,title=data['grp'][i],loc="upper left",
-                                bbox_to_anchor=(grpW[-1],grpH[-1]),fontsize=5)#grpW[i],0.5,0.3
-      #leg = g.ax_heatmap.legend(handles=grpLegend[0],frameon=True,title=data['grp'][0],loc="upper left",
-      #                          bbox_to_anchor=(1.02,1-i*0.25),fontsize=5)#grpW[i],0.5,0.
+                                bbox_to_anchor=(grpW[-1],grpH[-1]),fontsize=5)
       cumulaMax = max([cumulaMax,grpWd[i]*characterW])
       grpH.append(grpH[-1]-grpLen[i]*characterH)
-      leg.get_title().set_fontsize(6)#min(grpSize)+2
+      leg.get_title().set_fontsize(6)
       g.ax_heatmap.add_artist(leg)
-    #ppr.pprint('HEAT post plotting cost %f seconds' % (time.time()-sT) )
-    return iostreamFig(g)#json.dumps([iostreamFig(g),Xdata])#)#
-  elif data['plotMethod']=='cHeatmap':
-    characterW=1/40
-    grpW = list()
-    grpN = list()
-    for gID in data['grp']:
-      grp = adata.obs[gID]
-      Ugrp = grp.unique()
-      grpN.append(1+len(Ugrp))
-      grpW.append(max([len(x) for x in Ugrp]))
-    legendCol = math.ceil(sum(grpN)/40)
-    w=w+characterW*sum(sorted(grpW,reverse=True)[0:legendCol])
-    strF = ('%s/HEAT%f.csv' % (data["CLItmp"],time.time()))
-    D = adata.to_df()
-    if data['norm']=='zscore':
-      for one in D.columns:
-        D[one] = (D[one]-D[one].mean())/D[one].std()
-      colTitle="Z-score"
-    D = pd.concat([D,adata.obs],axis=1,sort=False)
-    D.to_csv(strF,index=False)
-
-    if len(data['gAnno'])>0:
-      gAnno = pd.DataFrame(data['gAnno'])
-      gAnno.to_csv(strF.replace("HEAT","HEATgene"),index=False)
-    elif data['gAnnoDef']:
-      gAnno = pd.read_csv("%s/proteinatlas_protein_class.csv"%strExePath,index_col=0,header=0)
-      gNames = {i:i.upper() for i in data['genes']}
-      gAnno = gAnno.loc[list(set(gNames.values()) & set(gAnno.index)),:].iloc[:,1:]
-      for one in [i for i in gNames.values() if i not in gAnno.index]:
-        gAnno.loc[one,:] = np.nan
-      gAnno = gAnno.loc[gNames.values(),:]
-      gAnno.index=gNames.keys()
-      gAnno.fillna("N",inplace=True)
-      gAnno.to_csv(strF.replace("HEAT","HEATgene"))
-      #ppr.pprint(gAnno)
-    ## plot in R
-    cmd = "%s/complexHeatmap.R %s %s %s %s %s %s %s %s %s %s %s %s %s %s '%s'"%(strExePath,strF,','.join(data['genes']),colTitle,','.join(data['order']),str(data['width']),str(data['height']),heatCol,
-      str(data['legendRow']),str(data['fontadj']),
-      data['figOpt']['img'],str(data['figOpt']['fontsize']),str(data['figOpt']['dpi']),str(data['swapAxes']),data['figOpt']['vectorFriendly'],data['Rlib'])
-
-    #ppp = pprint.PrettyPrinter(depth=6,width=300)
-    #ppp.pprint(cmd)
-    #return SyntaxError("in R: ")
-    res = subprocess.run(cmd,check=True,shell=True,capture_output=True)#
-    img = res.stdout.decode('utf-8')
-    os.remove(strF)
-    #silentRM(strF.replace("HEAT","HEATgene"))
-    if 'Error' in res.stderr.decode('utf-8'):
-      raise SyntaxError("in R: "+res.stderr.decode('utf-8'))
-    return img
+    return iostreamFig(g)
   else:
     raise ValueError('Unknown heatmap plotting method (%s)!'%data['plotMethod'])
 
