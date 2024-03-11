@@ -16,7 +16,6 @@ cp vip.env $strPath/server/app/. 2>/dev/null | true
 cp fgsea.R $strPath/server/app/.
 mkdir -p $strPath/server/app/gsea
 cp gsea/*gmt $strPath/server/app/gsea
-cp complexHeatmap.R $strPath/server/app/.
 cp volcano.R $strPath/server/app/.
 
 if [ -n "$1" ]; then
@@ -26,7 +25,6 @@ if [ -n "$1" ]; then
   cp volcano.R $strPath/server/app/.
   cp browserPlot.R $strPath/server/app/.
   cp tsPlot.R $strPath/server/app/.
-  cp complexHeatmap.R $strPath/server/app/.
   cp proteinatlas_protein_class.csv $strPath/server/app/.
   cp complex_vlnplot_multiple.R $strPath/server/app/.
   if [ "$(uname -s)" = "Darwin" ]; then
