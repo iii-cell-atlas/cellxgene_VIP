@@ -6990,6 +6990,7 @@ function hp_umap(figOpt, selected_cells = 0){
 
   update_option = document.getElementById("hp_update_opt").value;
 
+  var imgFmt = window.figOpt['img'];
 
   //deactivate buttons in hp tab
   $(".hpCC").prop("disabled",true);
@@ -7021,7 +7022,14 @@ function hp_umap(figOpt, selected_cells = 0){
       parasite_json = figure;
     }
 
-    Plotly.newPlot(figOpt,figure.data, figure.layout);
+    var config = {
+      toImageButtonOptions: {
+        format: imgFmt,
+        filename: figOpt
+      }
+    }
+
+    Plotly.newPlot(figOpt,figure.data, figure.layout, config);
 
     hp_lasso_update(figOpt)
         
