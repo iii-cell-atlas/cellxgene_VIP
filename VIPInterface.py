@@ -1754,8 +1754,12 @@ def cellpopview(data):
 
     adata = data['data_adapter'].data.copy()
 
-    # Get image format
-    img_fmt = data["imgFmt"]
+    # Get image parameters
+    img_fmt = rcParams['savefig.format']
+    img_dpi = float(rcParams['figure.dpi'])
+    if img_fmt == "pdf":
+        # Can't export interactive plotly plots as pdf
+        img_fmt = "png"
 
     # Subset Data by cluster.
     cluster_key = data['ClusterKey']
@@ -1811,15 +1815,15 @@ def cellpopview(data):
 
     hd = {'Gene_Name':False,condition_1:False,condition_2:False,gene_metaData:True}
 
-    cellpop_plot = px.scatter(plot_dataframe, x=condition_1, y=condition_2, hover_data=hd, hover_name="Gene_Name", title=plot_title)
+    cellpop_plot = px.scatter(plot_dataframe, x=condition_1, y=condition_2, hover_data=hd, hover_name="Gene_Name", title=plot_title,
+                              render_mode='svg' if img_fmt == 'svg' else 'auto')
 
     div = plotIO.to_html(cellpop_plot,
                          config={
                            "toImageButtonOptions": {
                              "format": img_fmt,
                              "filename": "cellpopview",
-                            #  "height": None,
-                            #  "width": None
+                             "scale": int(img_dpi/150) if img_fmt == "png" else 1
                            }
                          })
     
