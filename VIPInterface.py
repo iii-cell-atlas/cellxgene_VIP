@@ -357,12 +357,11 @@ def distributeTask(aTask):
 def HELLO(data):
   return 'Hi, connected.'
 
-def iostreamFig(fig):
+def iostreamFig(fig, format=None, dpi='figure'):
   #getLock(iosLock)
   figD = BytesIO()
-  #fig.savefig("test.png")
   #ppr.pprint('io located at %d'%int(str(figD).split(" ")[3].replace(">",""),0))
-  fig.savefig(figD,bbox_inches="tight")
+  fig.savefig(figD, bbox_inches="tight", format=format, dpi=dpi)
   #ppr.pprint(sys.getsizeof(figD))
   #ppr.pprint('io located at %d'%int(str(figD).split(" ")[3].replace(">",""),0))
   imgD = base64.encodebytes(figD.getvalue()).decode("utf-8")
