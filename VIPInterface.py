@@ -122,7 +122,7 @@ def initialization(data,appConfig):
 
 def setFigureOpt(opt):
   sc.set_figure_params(dpi_save=int(opt['dpi']),fontsize= float(opt['fontsize']),vector_friendly=(opt['vectorFriendly'] == 'Yes'),transparent=(opt['transparent'] == 'Yes'),color_map=opt['colorMap'])
-  rcParams.update({'savefig.format':opt['img']})
+  rcParams.update({'savefig.format':opt['img'], 'figure.dpi':opt['dpi']})
 
 def getObs(data):
   selC = list(data['cells'].values())
@@ -357,11 +357,11 @@ def distributeTask(aTask):
 def HELLO(data):
   return 'Hi, connected.'
 
-def iostreamFig(fig, format=None, dpi='figure'):
+def iostreamFig(fig):
   #getLock(iosLock)
   figD = BytesIO()
   #ppr.pprint('io located at %d'%int(str(figD).split(" ")[3].replace(">",""),0))
-  fig.savefig(figD, bbox_inches="tight", format=format, dpi=dpi)
+  fig.savefig(figD, bbox_inches="tight")
   #ppr.pprint(sys.getsizeof(figD))
   #ppr.pprint('io located at %d'%int(str(figD).split(" ")[3].replace(">",""),0))
   imgD = base64.encodebytes(figD.getvalue()).decode("utf-8")
