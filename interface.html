@@ -6158,8 +6158,6 @@ function CellPopPlot(){
 
   var geneMetaData = document.getElementById("gene_MetaCat").value;
 
-  var imgFmt = window.figOpt['img'];
-
   if(CPV_Con1 == CPV_Con2) {
     $("#CPVnote").text('Please input two different conditions');
     return
@@ -6951,7 +6949,8 @@ function hpViolins(){
   $(".hpViolpngBT").prop('disabled', true);
   var D = {'method':'hp_viol',
           'h_prefix':hostPrefix,
-          'p_prefix':parasitePrefix};
+          'p_prefix':parasitePrefix,
+          'figOpt':window.figOpt};
 
 $.ajax({
 type:"POST",
@@ -6997,6 +6996,14 @@ function hp_umap(figOpt, selected_cells = 0){
   update_option = document.getElementById("hp_update_opt").value;
 
   var imgFmt = window.figOpt['img'];
+  if (imgFmt === "pdf") {
+    //Can't export interactive plotly plots as pdf
+    imgFmt = "png"
+  }
+  var imgScl = Number(window.figOpt['dpi'])/150
+  if (imgFmt === "svg") {
+    imgScl = 1
+  }
 
   //deactivate buttons in hp tab
   $(".hpCC").prop("disabled",true);
@@ -7031,7 +7038,8 @@ function hp_umap(figOpt, selected_cells = 0){
     var config = {
       toImageButtonOptions: {
         format: imgFmt,
-        filename: figOpt
+        filename: figOpt,
+        scale: imgScl
       }
     }
 
