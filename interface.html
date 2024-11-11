@@ -1970,8 +1970,9 @@
         <select id="pseudo_cell_annot"></select></p>
       </div>
       <button class="pseudoAnalysis" onclick="pseudoPlot()"><b>Pseudotime Plot</b></button>
+      <button class="pseudoPngBT" onclick="saveImg('pseudoimg')" disabled>Save</button>
       <div id="pseudoSpin" class="loading style-2" style="visibility: hidden;"><div class="loading-wheel"></div></div>
-      <p id="pseudoFig"></p>
+      <p id="pseudofig"></p>
       <p id="pseudoNote" style="color:red;"></p>
     </div><!--Pseudo-->
 
@@ -6357,14 +6358,15 @@ function pseudoPlot(){
   if (includePseudo == "true"){ // feature toggle
 
   document.getElementById("pseudoSpin").style.visibility="visible";
-
+  $(".pseudoPngBT").prop('disabled', true);
   var D = {
   'method':'pseudo',
   'Dataset': window.store.getState().config.displayNames.dataset,
   'cells':cells,
   'genes':[],
   'grp':grp,
-  'annot':annot
+  'annot':annot,
+  'figOpt':window.figOpt
   };
 
   $.ajax({
@@ -6382,7 +6384,8 @@ function pseudoPlot(){
   
     document.getElementById("pseudoSpin").style.visibility="hidden";
 
-    showImg('pseudoFig',res);
+    showImg('pseudofig',res);
+    $(".pseudoPngBT").prop('disabled', false);
 
   },
   error: function() {
