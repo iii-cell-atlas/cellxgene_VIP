@@ -122,7 +122,7 @@ def initialization(data,appConfig):
 
 def setFigureOpt(opt):
   sc.set_figure_params(dpi_save=int(opt['dpi']),fontsize= float(opt['fontsize']),vector_friendly=(opt['vectorFriendly'] == 'Yes'),transparent=(opt['transparent'] == 'Yes'),color_map=opt['colorMap'])
-  rcParams.update({'savefig.format':opt['img']})
+  rcParams.update({'savefig.format':opt['img'], 'figure.dpi':opt['dpi']})
 
 def getObs(data):
   selC = list(data['cells'].values())
@@ -360,9 +360,8 @@ def HELLO(data):
 def iostreamFig(fig):
   #getLock(iosLock)
   figD = BytesIO()
-  #fig.savefig("test.png")
   #ppr.pprint('io located at %d'%int(str(figD).split(" ")[3].replace(">",""),0))
-  fig.savefig(figD,bbox_inches="tight")
+  fig.savefig(figD, bbox_inches="tight")
   #ppr.pprint(sys.getsizeof(figD))
   #ppr.pprint('io located at %d'%int(str(figD).split(" ")[3].replace(">",""),0))
   imgD = base64.encodebytes(figD.getvalue()).decode("utf-8")
@@ -1755,6 +1754,13 @@ def cellpopview(data):
 
     adata = data['data_adapter'].data.copy()
 
+    # Get image parameters
+    img_fmt = rcParams['savefig.format']
+    img_dpi = float(rcParams['figure.dpi'])
+    if img_fmt == "pdf":
+        # Can't export interactive plotly plots as pdf
+        img_fmt = "png"
+
     # Subset Data by cluster.
     cluster_key = data['ClusterKey']
     
@@ -1809,9 +1815,17 @@ def cellpopview(data):
 
     hd = {'Gene_Name':False,condition_1:False,condition_2:False,gene_metaData:True}
 
-    cellpop_plot = px.scatter(plot_dataframe, x=condition_1, y=condition_2, hover_data=hd, hover_name="Gene_Name", title=plot_title)
+    cellpop_plot = px.scatter(plot_dataframe, x=condition_1, y=condition_2, hover_data=hd, hover_name="Gene_Name", title=plot_title,
+                              render_mode='svg' if img_fmt == 'svg' else 'auto')
 
-    div = plotIO.to_html(cellpop_plot)
+    div = plotIO.to_html(cellpop_plot,
+                         config={
+                           "toImageButtonOptions": {
+                             "format": img_fmt,
+                             "filename": "cellpopview",
+                             "scale": int(img_dpi/150) if img_fmt == "png" else 1
+                           }
+                         })
     
     return div
 
@@ -2006,6 +2020,14 @@ def tradeSeqPlot(data):
 
   ro.globalenv["strPath"] = strExePath
 
+  img_fmt = data["figOpt"]["img"]
+  if img_fmt == "pdf":
+    img_mime = "application/pdf" 
+  else:
+    img_mime = "image/" + img_fmt
+  if img_fmt == "svg":
+      img_mime += "+xml"
+
   res = ro.r('''
 
     smooth = predictSmoother(some_data,gene1,Xcols)
@@ -2055,16 +2077,16 @@ def tradeSeqPlot(data):
     x = PlotSmoothers(some_data, gene = gene1, Xcolnames = Xcols, lwd = 0.3, size = 1/10, plotLineages = FALSE, pointCol = "Group") + 
     geom_smooth(data = smoothCombo, aes(x = time, y = .data[[gene1]],group = combo, colour = combo))
    
-    tempID = paste(s_id,".png",sep="")
-    ggsave(tempID, x)
+    tempID = paste(s_id,".%s",sep="")
+    ggsave(tempID, x, dpi=%s)
 
-    fig = base64enc::dataURI(file = tempID, mime = "image/png")
-    fig = gsub("data:image/png;base64,","",fig)
+    fig = base64enc::dataURI(file = tempID, mime = "%s")
+    fig = gsub("data:%s;base64,","",fig)
 
     file.remove(tempID)
 
     fig
-    ''')
+    ''' % (img_fmt, data["figOpt"]["dpi"], img_mime, img_mime.replace('+', '[+]')))
 
   img = res[0]
 
@@ -2311,7 +2333,7 @@ def hpClusterViolins(data):
   fig = sc.pl.violin(adata, ['percent_parasite', 'percent_host'],
              jitter=0.4, multi_panel=True, groupby="seurat_clusters")
   
-  html = "hpViolins"
+  html = "hpViolinsfig"
 
   note = ""
 

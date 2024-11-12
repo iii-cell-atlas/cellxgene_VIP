@@ -21,4 +21,5 @@ dependencies:
  - r-devtools
  - r-spatstat=1.64_1
  - r-ggrastr
+ - r-svglite
 
