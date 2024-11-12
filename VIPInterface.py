@@ -2021,9 +2021,12 @@ def tradeSeqPlot(data):
   ro.globalenv["strPath"] = strExePath
 
   img_fmt = data["figOpt"]["img"]
-  img_mime = "image/" + img_fmt
+  if img_fmt == "pdf":
+    img_mime = "application/pdf" 
+  else:
+    img_mime = "image/" + img_fmt
   if img_fmt == "svg":
-      img_mime += "+xml" 
+      img_mime += "+xml"
 
   res = ro.r('''
 
