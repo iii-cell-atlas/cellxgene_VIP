@@ -2074,16 +2074,16 @@ def tradeSeqPlot(data):
     x = PlotSmoothers(some_data, gene = gene1, Xcolnames = Xcols, lwd = 0.3, size = 1/10, plotLineages = FALSE, pointCol = "Group") + 
     geom_smooth(data = smoothCombo, aes(x = time, y = .data[[gene1]],group = combo, colour = combo))
    
-    tempID = paste(s_id,".{fmt}",sep="")
+    tempID = paste(s_id,".%s",sep="")
     ggsave(tempID, x)
 
-    fig = base64enc::dataURI(file = tempID, mime = "{mime}")
-    fig = gsub("data:{mime};base64,","",fig)
+    fig = base64enc::dataURI(file = tempID, mime = "%s")
+    fig = gsub("data:%s;base64,","",fig)
 
     file.remove(tempID)
 
     fig
-    '''.format(fmt=img_fmt, mime=img_mime))
+    ''' % (img_fmt, img_mime, img_mime))
 
   img = res[0]
 
