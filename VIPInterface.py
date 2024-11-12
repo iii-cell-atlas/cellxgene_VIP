@@ -2020,6 +2020,11 @@ def tradeSeqPlot(data):
 
   ro.globalenv["strPath"] = strExePath
 
+  img_fmt = data["figOpt"]["img"]
+  img_mime = "image/" + img_fmt
+  if img_fmt == "svg":
+      img_mime += "+xml" 
+
   res = ro.r('''
 
     smooth = predictSmoother(some_data,gene1,Xcols)
@@ -2069,16 +2074,16 @@ def tradeSeqPlot(data):
     x = PlotSmoothers(some_data, gene = gene1, Xcolnames = Xcols, lwd = 0.3, size = 1/10, plotLineages = FALSE, pointCol = "Group") + 
     geom_smooth(data = smoothCombo, aes(x = time, y = .data[[gene1]],group = combo, colour = combo))
    
-    tempID = paste(s_id,".png",sep="")
+    tempID = paste(s_id,".{fmt}",sep="")
     ggsave(tempID, x)
 
-    fig = base64enc::dataURI(file = tempID, mime = "image/png")
-    fig = gsub("data:image/png;base64,","",fig)
+    fig = base64enc::dataURI(file = tempID, mime = "{mime}")
+    fig = gsub("data:{mime};base64,","",fig)
 
     file.remove(tempID)
 
     fig
-    ''')
+    '''.format(fmt=img_fmt, mime=img_mime))
 
   img = res[0]
 
