@@ -2083,7 +2083,7 @@ def tradeSeqPlot(data):
     file.remove(tempID)
 
     fig
-    ''' % (img_fmt, img_mime, img_mime))
+    ''' % (img_fmt, img_mime, img_mime.replace('+', '[+]')))
 
   img = res[0]
 
