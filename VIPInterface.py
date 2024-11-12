@@ -2078,7 +2078,7 @@ def tradeSeqPlot(data):
     geom_smooth(data = smoothCombo, aes(x = time, y = .data[[gene1]],group = combo, colour = combo))
    
     tempID = paste(s_id,".%s",sep="")
-    ggsave(tempID, x)
+    ggsave(tempID, x, dpi=%s)
 
     fig = base64enc::dataURI(file = tempID, mime = "%s")
     fig = gsub("data:%s;base64,","",fig)
@@ -2086,7 +2086,7 @@ def tradeSeqPlot(data):
     file.remove(tempID)
 
     fig
-    ''' % (img_fmt, img_mime, img_mime.replace('+', '[+]')))
+    ''' % (img_fmt, data["figOpt"]["dpi"], img_mime, img_mime.replace('+', '[+]')))
 
   img = res[0]
 
