@@ -1103,7 +1103,7 @@
     		  <select id="HEATplotMethod" onchange="if($(this).val()=='cHeatmap'){$('#HEATcomplexSetting').show();$('#HEATseabornSetting').hide()}else{$('#HEATcomplexSetting').hide();$('#HEATseabornSetting').show()}">
     		    <option value="sns">Seaborn (python)</option>
     		  </select></p>
-        <div id="HEATcomplexSetting">
+        <div id="HEATcomplexSetting" style="display:none">
           <p>Gene as
             <input type="radio" name="HEATswapAxes" value="F" checked onchange="$('#HEATcomplexSettingSwap').hide()">Column
             <input type="radio" name="HEATswapAxes" value="T" onchange="$('#HEATcomplexSettingSwap').show()">Row
@@ -1123,11 +1123,11 @@
           </p>
           <div id='HEATorderGrp'>
             <p>Change the annotation order by dragging items up or down, cluster annotations can also be removed by clicking <i class='fa fa-trash-o'></i>:</p>
-            <ul id="HEATdynList" class="sortable-list"></ul><!--   -->
+            <ul id="HEATdynList" class="sortable-list"></ul>
           </div>
 
         </div>
-        <div id="HEATseabornSetting" style="display:none">
+        <div id="HEATseabornSetting">
           <p>Cluster by:
             <select id="HEATorder"></select></p>
         </div>
